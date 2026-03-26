@@ -7,6 +7,14 @@ description: Use when analyzing Java heap dumps (.hprof/.hdump) for memory leaks
 
 Analyze Java heap dumps using Eclipse MAT and the `heap-oql` CLI plugin. Structured TSV output, fully programmable, no GUI.
 
+## Goal
+
+Present the user with a summary of what's consuming heap memory. The deliverable is a breakdown of top memory consumers by retained heap, with class names, instance counts, and sizes. Stop after presenting this summary and ask the user what they want to dig into next — do NOT keep running analysis unprompted.
+
+## IMPORTANT: Do Not Search for Heap Dumps
+
+**ASK the user for the heap dump file path.** Do not scan the filesystem looking for `.hprof` or `.hdump` files. The user knows where their dump is.
+
 ## Bootstrap Flow
 
 Before any analysis, ensure the toolchain is ready. Follow this decision tree top-to-bottom — skip steps that are already satisfied.
@@ -152,14 +160,20 @@ Once bootstrap is complete, analyze the dump in phases. Each phase narrows focus
 
 ### Phase 1: Reports (High-Level Overview)
 
+**First, check if index files already exist** next to the dump (e.g., `<dump>.index`, `<dump>.threads`). If they exist, the dump was already parsed — skip straight to Phase 2 with `heap-oql` which will reuse the indexes. Only run ParseHeapDump if no indexes exist yet.
+
 ```bash
+# Check for existing indexes
+ls <dump>.index 2>/dev/null && echo "Indexes exist — skip to Phase 2"
+
+# Only if no indexes: generate reports (also creates indexes)
 $MAT_DIR/ParseHeapDump.sh <dump> org.eclipse.mat.api:suspects
 $MAT_DIR/ParseHeapDump.sh <dump> org.eclipse.mat.api:top_components
 ```
 
 Reports are HTML, written next to the dump file. Read them to identify dominant classes.
 
-**First run creates index files** (~10-30 min for large dumps). Subsequent runs reuse them.
+**Index creation takes ~10-30 min for large dumps.** Once created, all subsequent commands (reports and heap-oql) reuse them instantly.
 
 ### Phase 2: Class Histogram
 
