@@ -9,7 +9,16 @@ Analyze Java heap dumps using Eclipse MAT and the `heap-oql` CLI plugin. Structu
 
 ## Goal
 
-Present the user with a summary of what's consuming heap memory. The deliverable is a breakdown of top memory consumers by retained heap, with class names, instance counts, and sizes. Stop after presenting this summary and ask the user what they want to dig into next — do NOT keep running analysis unprompted.
+Present the user with a summary of what's consuming heap memory. **Always use markdown tables** to present results — not raw TSV, not bullet lists, not prose. Tables are easier to scan and compare.
+
+Example output format:
+| Class | Instances | Retained Heap | % of Total |
+|-------|-----------|---------------|------------|
+| com.example.MyCache | 14 | 1.16 GB | 17% |
+
+Use human-readable sizes (KB/MB/GB) and include percentage of total heap where useful.
+
+Stop after presenting the summary and ask the user what they want to dig into next — do NOT keep running analysis unprompted.
 
 ## IMPORTANT: Do Not Search for Heap Dumps
 
