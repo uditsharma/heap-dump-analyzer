@@ -30,6 +30,11 @@ git clone git@github.com:uditsharma/heap-dump-analyzer.git .agents/skills/heap-d
 
 Codex discovers skills automatically from `~/.agents/skills/`, `$REPO_ROOT/.agents/skills/`, or `.agents/skills/` in the current directory. Follows the [agentskills.io](https://agentskills.io/specification) specification.
 
+**Gemini CLI:**
+```bash
+gemini skills install https://github.com/uditsharma/heap-dump-analyzer.git
+```
+
 **Other agents:**
 Copy `SKILL.md` into your agent's instructions or context.
 
