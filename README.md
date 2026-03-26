@@ -1,6 +1,8 @@
 # heap-dump-analyzer
 
-A Claude Code skill for analyzing Java heap dumps. Sets up Eclipse MAT + a custom `heap-oql` CLI plugin from scratch, then walks through structured heap analysis.
+A skill for analyzing Java heap dumps. Sets up Eclipse MAT + a custom `heap-oql` CLI plugin from scratch, then walks through structured heap analysis.
+
+Works with any AI coding agent that can run shell commands — Claude Code, Codex, or others.
 
 ## What it does
 
@@ -12,13 +14,17 @@ A Claude Code skill for analyzing Java heap dumps. Sets up Eclipse MAT + a custo
 
 ## Install
 
+**Claude Code:**
 ```bash
 claude install-skill gh:uditsharma/heap-dump-analyzer
 ```
 
+**Codex / other agents:**
+Copy `SKILL.md` into your agent's instructions or context (e.g., reference it in `AGENTS.md`, or include it in your project).
+
 ## Usage
 
-Once installed, just give Claude Code a heap dump file and ask it to analyze:
+Once installed, just give your agent a heap dump file and ask it to analyze:
 
 ```
 > analyze the heap dump at /path/to/dump.hprof
@@ -27,11 +33,10 @@ Once installed, just give Claude Code a heap dump file and ask it to analyze:
 > run an OQL query to find all HashMap instances over 1MB retained
 ```
 
-The skill activates automatically when Claude detects a heap analysis task.
+The skill activates automatically when the agent detects a heap analysis task.
 
 ## Requirements
 
-- [Claude Code](https://claude.ai/claude-code) CLI
 - Java 17+ (skill will guide you through sdkman install if needed)
 - ~100MB disk for Eclipse MAT download
 
