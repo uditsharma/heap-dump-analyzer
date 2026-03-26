@@ -69,7 +69,7 @@
         "Agent detected MAT is not installed",
         "Agent provided a download URL for the correct platform",
         "Agent checked Java version",
-        "Agent mentioned sdkman for Java installation if needed",
+        "If Java < 17, agent recommended sdkman for installation; if Java >= 17, agent confirmed it meets the requirement",
         "Agent ran or referenced scripts/install-heap-oql.sh for plugin setup",
         "Agent calculated required -Xmx based on dump file size"
       ]

@@ -150,6 +150,7 @@ All output is TSV on stdout. stderr goes to `/tmp/heap-oql-stderr.log`. **Always
 
 ## Common Mistakes
 
+- **Collection sizes from reports vs actual** — MAT reports count Node objects, not map entries. A `HashMap$Node` can chain multiple entries. **Always use `collection_fill` for authoritative entry counts** (`size` column = `HashMap.size()`). Never trust instance counts from histogram or leak suspects as collection sizes.
 - **`SELECT` vs `SELECT OBJECTS`** — use `SELECT OBJECTS` for TSV output
 - **Unquoted OQL** — always double-quote the query string
 - **Insufficient MAT heap** — check `-Xmx` in `MemoryAnalyzer.ini`
