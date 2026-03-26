@@ -21,14 +21,10 @@ claude install-skill gh:uditsharma/heap-dump-analyzer
 
 **Codex:**
 ```bash
-# Per-user (works across all repos)
 git clone git@github.com:uditsharma/heap-dump-analyzer.git ~/.agents/skills/heap-dump-analyzer
-
-# Or per-repo
-git clone git@github.com:uditsharma/heap-dump-analyzer.git .agents/skills/heap-dump-analyzer
 ```
 
-Codex discovers skills automatically from `~/.agents/skills/`, `$REPO_ROOT/.agents/skills/`, or `.agents/skills/` in the current directory. Follows the [agentskills.io](https://agentskills.io/specification) specification.
+Codex scans `~/.agents/skills/`, `$REPO_ROOT/.agents/skills/`, and `.agents/skills/` — symlinks are followed.
 
 **Gemini CLI:**
 ```bash
