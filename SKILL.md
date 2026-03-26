@@ -15,6 +15,8 @@ Present the user with a summary of what's consuming heap memory. The deliverable
 
 **ASK the user for the heap dump file path.** Do not scan the filesystem looking for `.hprof` or `.hdump` files. The user knows where their dump is.
 
+**Warn the user:** MAT creates index files (`.index`, `.threads`, `.o2c.index`, etc.) next to the dump file. These can be several GB for large dumps. Suggest the user move the dump to a scratch directory (e.g., `/tmp/heap/`) before analysis to avoid cluttering their workspace.
+
 ## Bootstrap Flow
 
 Before any analysis, ensure the toolchain is ready. Follow this decision tree top-to-bottom — skip steps that are already satisfied.
