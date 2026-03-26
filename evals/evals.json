@@ -1,0 +1,78 @@
+{
+  "skill_name": "heap-dump-analyzer",
+  "notes": "Tests require a Java heap dump file. Set HEAP_DUMP env var to the dump path before running.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a heap dump at ${HEAP_DUMP}. Can you tell me what's eating all the memory?",
+      "expected_output": "A markdown table showing top memory consumers by retained heap, with class names, instance counts, sizes in human-readable format (MB/GB), and percentage of total heap.",
+      "assertions": [
+        "Output contains a markdown table (not raw TSV or bullet list)",
+        "Table includes class names, instance counts, and retained heap sizes",
+        "Sizes are in human-readable format (KB, MB, or GB), not raw bytes",
+        "Table is sorted by retained heap descending",
+        "Agent stopped after presenting the summary and asked what to dig into next",
+        "Agent did NOT search the filesystem for heap dumps — it used the path provided"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need to analyze a heap dump. Can you help?",
+      "expected_output": "Agent asks the user for the heap dump file path instead of searching for it. May also ask about MAT installation.",
+      "assertions": [
+        "Agent asked for the heap dump file path",
+        "Agent did NOT run find/ls/glob to search for heap dump files",
+        "Agent checked or asked about MAT installation"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I've got a heap dump at ${HEAP_DUMP}. Why is java.util.HashMap using so much memory? Can you trace it to the GC root?",
+      "expected_output": "A drill-down starting with HashMap instances table, then a GC root path showing the reference chain from the largest HashMap to its GC root.",
+      "assertions": [
+        "Output includes a table of HashMap instances with retained sizes",
+        "Output includes a GC root path showing the reference chain",
+        "GC root path ends at an actual GC root (thread, class, etc.)",
+        "Agent used heap-oql gc_roots command",
+        "Results are in markdown table format"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "can you check ${HEAP_DUMP} for wasted memory? like duplicate strings or over-allocated collections",
+      "expected_output": "Two tables: duplicate strings with counts and wasted bytes, and collections with low fill ratios showing size vs capacity.",
+      "assertions": [
+        "Output includes duplicate string analysis with counts",
+        "Output includes collection fill ratio analysis",
+        "Agent used heap-oql duplicates command",
+        "Agent used heap-oql collection_fill command",
+        "Wasted memory is quantified in human-readable sizes"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "We're adding a new cache with 20 million entries (HashMap<String, String>, avg key 12 chars, avg value 8 chars). Based on ${HEAP_DUMP}, how much memory should I provision?",
+      "expected_output": "A memory sizing calculation showing per-entry cost, steady-state size, peak during refresh, and recommended heap size. Should use data from the heap dump to validate the per-entry cost estimate.",
+      "assertions": [
+        "Output includes per-entry memory cost calculation",
+        "Calculation accounts for HashMap.Node, String objects, and byte arrays",
+        "Output accounts for cache refresh overhead (old + new coexisting)",
+        "A specific GB recommendation is provided",
+        "Agent used heap-oql to verify per-entry cost against actual data in the dump"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "I don't have MAT installed. I have a heap dump at /tmp/my-app.hprof and I want to analyze it.",
+      "expected_output": "Agent guides through MAT installation (download URL for user's platform), Java version check, heap-oql plugin build, and MAT heap sizing based on dump file size.",
+      "assertions": [
+        "Agent detected MAT is not installed",
+        "Agent provided a download URL for the correct platform",
+        "Agent checked Java version",
+        "Agent mentioned sdkman for Java installation if needed",
+        "Agent ran or referenced scripts/install-heap-oql.sh for plugin setup",
+        "Agent calculated required -Xmx based on dump file size"
+      ]
+    }
+  ]
+}
