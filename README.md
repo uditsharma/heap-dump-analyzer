@@ -19,8 +19,19 @@ Works with any AI coding agent that can run shell commands — Claude Code, Code
 claude install-skill gh:uditsharma/heap-dump-analyzer
 ```
 
-**Codex / other agents:**
-Copy `SKILL.md` into your agent's instructions or context (e.g., reference it in `AGENTS.md`, or include it in your project).
+**Codex:**
+```bash
+# Per-user (works across all repos)
+git clone git@github.com:uditsharma/heap-dump-analyzer.git ~/.agents/skills/heap-dump-analyzer
+
+# Or per-repo
+git clone git@github.com:uditsharma/heap-dump-analyzer.git .agents/skills/heap-dump-analyzer
+```
+
+Codex discovers skills automatically from `~/.agents/skills/`, `$REPO_ROOT/.agents/skills/`, or `.agents/skills/` in the current directory. Follows the [agentskills.io](https://agentskills.io/specification) specification.
+
+**Other agents:**
+Copy `SKILL.md` into your agent's instructions or context.
 
 ## Usage
 
