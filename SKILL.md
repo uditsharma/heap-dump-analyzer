@@ -18,7 +18,16 @@ Example output format:
 
 Use human-readable sizes (KB/MB/GB) and include percentage of total heap where useful.
 
-Stop after presenting the summary and ask the user what they want to dig into next — do NOT keep running analysis unprompted.
+Stop after presenting each summary and ask the user what they want to dig into next — do NOT keep running analysis unprompted.
+
+**Drill-down flow:** The skill supports iterative breakdown. At any level, the user can ask to go deeper:
+
+1. **Top-level:** "What's using memory?" → `histogram` → table of classes by retained heap
+2. **Class-level:** "Break down HashMap" → `instances <class>` → table of individual instances
+3. **Instance-level:** "What's inside the biggest one?" → `fields <class>` or `oql` → table of field values and referenced objects
+4. **Custom:** "Show me all strings over 10KB" → `oql` → filtered results
+
+Each level produces a table, then stops. The user drives how deep to go.
 
 ## IMPORTANT: Do Not Search for Heap Dumps
 
