@@ -119,6 +119,14 @@ public class HeapOQLApp implements IApplication {
                     runThreads(snapshot);
                     break;
 
+                case "stack":
+                    if (args.length < 3) {
+                        System.err.println("ERROR: stack mode requires a thread object id or 0xaddress");
+                        break;
+                    }
+                    runStack(snapshot, args[2]);
+                    break;
+
                 case "classloaders":
                     runClassLoaders(snapshot);
                     break;
@@ -566,7 +574,12 @@ public class HeapOQLApp implements IApplication {
         System.err.println("Unreachable objects histogram");
 
         SnapshotInfo info = snapshot.getSnapshotInfo();
-        Object hist = info.getProperty("unreachableObjectsHistogram");
+        // MAT stores the histogram under the full class name (see GarbageCleaner /
+        // SnapshotImpl, which use UnreachableObjectsHistogram.class.getName()).
+        Object hist = info.getProperty(UnreachableObjectsHistogram.class.getName());
+        if (!(hist instanceof UnreachableObjectsHistogram)) {
+            hist = info.getProperty("unreachableObjectsHistogram");
+        }
 
         if (hist instanceof UnreachableObjectsHistogram) {
             UnreachableObjectsHistogram uHist = (UnreachableObjectsHistogram) hist;
@@ -646,6 +659,46 @@ public class HeapOQLApp implements IApplication {
         System.err.println("Total: " + rows.size() + " threads");
     }
 
+    // ── stack ────────────────────────────────────────────────────────────
+
+    private void runStack(ISnapshot snapshot, String idOrAddr) throws Exception {
+        int threadId;
+        if (idOrAddr.startsWith("0x") || idOrAddr.startsWith("0X")) {
+            long addr = Long.parseUnsignedLong(idOrAddr.substring(2), 16);
+            threadId = snapshot.mapAddressToId(addr);
+        } else {
+            threadId = Integer.parseInt(idOrAddr);
+        }
+
+        IThreadStack stack = snapshot.getThreadStack(threadId);
+        if (stack == null || stack.getStackFrames() == null) {
+            System.err.println("No stack frames for thread " + idOrAddr);
+            System.out.println("(no stack)");
+            return;
+        }
+
+        System.out.println("depth\tframe\tlocal_class\tlocal_address\tlocal_retained");
+        int depth = 0;
+        for (IStackFrame frame : stack.getStackFrames()) {
+            String text = frame.getText();
+            if (text != null) text = text.replaceAll("[\t\r\n]", " ").trim();
+            int[] locals = frame.getLocalObjectsIds();
+            if (locals == null || locals.length == 0) {
+                System.out.println(depth + "\t" + text + "\t\t\t");
+            } else {
+                for (int lid : locals) {
+                    IObject lo = snapshot.getObject(lid);
+                    long retained = snapshot.getRetainedHeapSize(lid);
+                    long addr = snapshot.mapIdToAddress(lid);
+                    System.out.println(depth + "\t" + text + "\t" + lo.getClazz().getName()
+                            + "\t0x" + Long.toHexString(addr) + "\t" + retained);
+                }
+            }
+            depth++;
+        }
+        System.err.println("Frames: " + depth);
+    }
+
     // ── classloaders ─────────────────────────────────────────────────────
 
     private void runClassLoaders(ISnapshot snapshot) throws Exception {
@@ -712,6 +765,7 @@ public class HeapOQLApp implements IApplication {
         System.err.println("  collection_fill <class>     Show collection size vs capacity");
         System.err.println("  unreachable                 Show unreachable objects histogram");
         System.err.println("  threads                     List threads with stack depths and retained sizes");
+        System.err.println("  stack <id|0xaddr>           Show a thread's stack frames with local variables");
         System.err.println("  classloaders                Show classloaders and their loaded class counts");
         System.err.println();
         System.err.println("Examples:");
