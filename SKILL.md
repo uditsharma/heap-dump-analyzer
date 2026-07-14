@@ -138,6 +138,7 @@ $MAT_DIR/ParseHeapDump.sh <dump> org.eclipse.mat.api:top_components
 | Collection fill | `heap-oql <dump> collection_fill <class>` | id, size, capacity, fill_ratio, retained |
 | Unreachable objects | `heap-oql <dump> unreachable` | class, count, shallow |
 | Thread overview | `heap-oql <dump> threads` | id, retained, thread_name, stack_depth |
+| Thread stack trace | `heap-oql <dump> stack <id\|0xaddr>` | depth, frame, local_class, local_address, local_retained |
 | ClassLoader analysis | `heap-oql <dump> classloaders` | id, class, retained, loaded_classes |
 
 All output is TSV on stdout. stderr goes to `/tmp/heap-oql-stderr.log`. **Always use `SELECT OBJECTS`** for OQL — plain `SELECT` can't render as TSV.
